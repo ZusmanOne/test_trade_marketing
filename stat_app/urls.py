@@ -7,5 +7,5 @@ router.register('statistics', StatisticViewSet, basename='statistics')
 urlpatterns = router.urls
 
 urlpatterns += [
-    path('<str:from_to>/<str:end_to>/', StatisticListRange.as_view()),
+    path('<str:from_date>/<str:to_date>/', StatisticListRange.as_view()),
 ]

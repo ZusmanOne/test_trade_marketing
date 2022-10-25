@@ -9,14 +9,14 @@ from rest_framework.decorators import action
 
 
 class StatisticListRange(APIView):
-    def get(self,request,from_to,end_to):
-        from_to = datetime.datetime.strptime(self.kwargs.get('from_to'), '%Y-%m-%d')
-        end_to = datetime.datetime.strptime(self.kwargs.get('end_to'), '%Y-%m-%d')
-        statistics = Statistic.objects.filter(event_date__date__range=[from_to, end_to]).order_by('event_date')
+    def get(self, request, from_date, to):
+        from_date = datetime.datetime.strptime(self.kwargs.get('from_date'), '%Y-%m-%d')
+        to_date = datetime.datetime.strptime(self.kwargs.get('to_date'), '%Y-%m-%d')
+        statistics = Statistic.objects.filter(event_date__date__range=[from_date, to_date]).order_by('event_date')
         statistic_serializer = StatisticSerializer(statistics, many=True)
         return Response(statistic_serializer.data, status=status.HTTP_200_OK)
 
-    def post(self,request,format=None):
+    def post(self, request):
         serializer = StatisticSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
