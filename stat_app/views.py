@@ -6,21 +6,24 @@ import datetime
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-
+from rest_framework.exceptions import NotFound
 
 class StatisticListRange(APIView):
-    def get(self, request, from_date, to):
-        from_date = datetime.datetime.strptime(self.kwargs.get('from_date'), '%Y-%m-%d')
-        to_date = datetime.datetime.strptime(self.kwargs.get('to_date'), '%Y-%m-%d')
-        statistics = Statistic.objects.filter(event_date__date__range=[from_date, to_date]).order_by('event_date')
-        statistic_serializer = StatisticSerializer(statistics, many=True)
-        return Response(statistic_serializer.data, status=status.HTTP_200_OK)
+    def get(self, request, from_date, to_date):
+            try:
+                from_date = datetime.datetime.strptime(self.kwargs.get('from_date'), '%Y-%m-%d')
+                to_date = datetime.datetime.strptime(self.kwargs.get('to_date'), '%Y-%m-%d')
+                statistics = Statistic.objects.filter(event_date__date__range=[from_date, to_date]).order_by('event_date')
+                statistic_serializer = StatisticSerializer(statistics, many=True)
+                return Response(statistic_serializer.data, status=status.HTTP_200_OK)
+            except ValueError:
+                return Response({'status': 'Invalid Data,not match format %Y-%m-%d'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         serializer = StatisticSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class StatisticViewSet(viewsets.ModelViewSet):
